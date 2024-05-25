@@ -14,9 +14,8 @@ func ParseJSON(r *http.Request, v interface{}) error {
 	return json.NewDecoder(r.Body).Decode(v)
 }
 
-func WriteJSON(w http.ResponseWriter, status int, v string) error {
-	w.Header().Set("Content-Type", "text/html")
+func WriteJSON(w http.ResponseWriter, status int, v any) error {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	w.Write([]byte(v))
-	return nil
+	return json.NewEncoder(w).Encode(v)
 }

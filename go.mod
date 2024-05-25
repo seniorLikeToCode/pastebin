@@ -2,4 +2,7 @@ module github.com/seniorLikeToCode/pastebin
 
 go 1.22.3
 
-require github.com/gorilla/mux v1.8.1 // indirect
+require (
+	github.com/gorilla/mux v1.8.1 // indirect
+	github.com/itchyny/base58-go v0.2.2 // indirect
+)
