@@ -1,81 +1,36 @@
 package main
 
 import (
-	"encoding/json"
+	"database/sql"
 	"log"
-	"net/http"
+	"os"
 
-	"github.com/gorilla/mux"
-	utils "github.com/seniorLikeToCode/pastebin"
-	"github.com/seniorLikeToCode/pastebin/generator"
+	_ "github.com/lib/pq" // assuming you are using PostgreSQL
+	"github.com/seniorLikeToCode/pastebin/cmd/api"
 )
 
-type Data struct {
-	Content string `json:"content"`
-}
-
-// temp db
-var store = make(map[string]string)
-
 func main() {
-	router := mux.NewRouter()
-
-	api := router.PathPrefix("/api/v1").Subrouter()
-
-	api.HandleFunc("/{id}", getContentHandler).Methods("POST")
-	api.HandleFunc("/", createContentHandler).Methods("POST")
-
-	// Serve static files
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./templates/"))))
-
-	// Serve index page on all unhandled routes
-	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./templates/index.html")
-	})
-
-	log.Println("Listening on port 5000")
-	if err := http.ListenAndServe(":5000", router); err != nil {
-		log.Fatal(err)
+	// Database connection setup (example for PostgreSQL)
+	connStr := "user=pastebinuser dbname=pastebin password=1234 sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Error connecting to the database: %v", err)
 	}
-}
+	defer db.Close()
 
-func getContentHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, ok := vars["id"]
-	if !ok {
-		http.Error(w, "ID not found", http.StatusBadRequest)
-		return
+	// Ensure the database is available
+	if err := db.Ping(); err != nil {
+		log.Fatalf("Error pinging the database: %v", err)
 	}
 
-	// log.Printf("Received ID: %s", id)
-
-	getContent, exists := store[id]
-	if !exists {
-		http.Error(w, "Content not found", http.StatusNotFound)
-		return
+	// Get the server address from environment variable or default
+	addr := os.Getenv("SERVER_ADDR")
+	if addr == "" {
+		addr = ":5000"
 	}
 
-	if err := utils.WriteJSON(w, http.StatusOK, map[string]string{"content": getContent}); err != nil {
-		log.Printf("Error writing JSON response: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-	}
-}
-
-func createContentHandler(w http.ResponseWriter, r *http.Request) {
-	var d Data
-	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
-		log.Printf("Error decoding JSON request body: %v", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// log.Printf("Received content: %s", d.Content)
-
-	tag := generator.GenerateTag(d.Content)
-	store[tag] = d.Content
-
-	if err := utils.WriteJSON(w, http.StatusOK, map[string]string{"id": tag}); err != nil {
-		log.Printf("Error writing JSON response: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	server := api.NewAPIServer(addr, db)
+	if err := server.Run(); err != nil {
+		log.Fatalf("Error running the server: %v", err)
 	}
 }

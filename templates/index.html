@@ -12,8 +12,12 @@
 </head>
 </head>
 
-<body class="h-screen bg-[#282c34] custom-scrollbar">
-    <pre><code id="paste-here" class="custom-scrollbar" contenteditable="true"></code></pre>
+<body class="h-screen bg-[#282c34] custom-scrollbar p-4">
+    <pre><code id="paste-here" class="custom-scrollbar hidden" contenteditable="true"></code></pre>
+
+    <textarea id="paste-here-textarea"
+        class="font-light text-slate-300 border-none outline-none resize-none pt-4 pl-4 w-full h-full text-xl bg-[#282c34] custom-scrollbar"
+        placeholder="Paste your code here and to save type ctrl + s"></textarea>
 
     <!-- Include Prism.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
