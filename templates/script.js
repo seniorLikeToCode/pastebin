@@ -1,3 +1,4 @@
+const baseURL = 'http://localhost:6322/api/v1/';
 const pb = document.getElementById('paste-here');
 const pbTextArea = document.getElementById('paste-here-textarea');
 pb.contentEditable = true;
@@ -9,6 +10,8 @@ const id = parts[parts.length - 1];
 function isValidID(uid) {
     if (uid.length !== 6) return true;
     pb.contentEditable = false;
+    pbTextArea.classList.add('hidden');
+    pb.classList.remove('hidden');
     return false;
 }
 
@@ -20,16 +23,13 @@ function handleRedirect(uid) {
 
 async function getLinkContent(uid) {
     if (isValidID(uid)) return;
-    const response = await fetch(`http://localhost:5000/api/v1/${uid}`, {
+    const response = await fetch(baseURL + uid, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         }
     });
     const data = await response.json();
-
-    pbTextArea.classList.add('hidden');
-    pb.classList.remove('hidden');
 
     pb.textContent = data.content;
     const result = hljs.highlightAuto(data.content);
@@ -59,7 +59,7 @@ function copyToClipboard(text) {
 }
 
 async function createLink() {
-    const response = await fetch('http://localhost:5000/api/v1/', {
+    const response = await fetch(baseURL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
