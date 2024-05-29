@@ -18,6 +18,7 @@ type Store struct {
 func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
 }
+
 func (s *Store) Create(d Data) error {
 	_, err := s.db.Exec("INSERT INTO data (uid, content) VALUES ($1, $2)", d.Uid, d.Content)
 	if err != nil {

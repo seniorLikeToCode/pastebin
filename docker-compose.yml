@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:14-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: pastebinuser
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: pastebin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: go run cmd/main.go
+    ports:
+      - "5000:5000"
+    networks:
+      - backend-network
+    depends_on:
+      - db
+    environment:
+      DB_USER: pastebinuser
+      DB_PASSWORD: 1234
+      DB_NAME: pastebin
+      DB_HOST: db
+      DB_PORT: 5432
+
+
+networks:
+  backend-network:
+
+volumes:
+  postgres_data:

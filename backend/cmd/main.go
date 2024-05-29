@@ -23,16 +23,18 @@ func main() {
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		dbHost, dbPort, dbUser, dbPassword, dbName)
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
+	db, err := sql.Open("postgres", connStr)
 
-	// Database connection setup (example for PostgreSQL)
-	// connStr := "user=pastebinuser dbname=pastebin password=1234 sslmode=disable"
-	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Fatalf("Error connecting to the database: %v", err)
 	}
 	defer db.Close()
+
+	// Ensure the database is available
+	if err := db.Ping(); err != nil {
+		log.Fatalf("Error pinging the database: %v", err)
+	}
 
 	// create a table if not exists
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS data (
@@ -43,11 +45,6 @@ func main() {
 
 	if err != nil {
 		log.Fatalf("Error creating the table: %v", err)
-	}
-
-	// Ensure the database is available
-	if err := db.Ping(); err != nil {
-		log.Fatalf("Error pinging the database: %v", err)
 	}
 
 	// Get the server address from environment variable or default
