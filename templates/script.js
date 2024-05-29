@@ -1,4 +1,4 @@
-const baseURL = 'http://localhost:6322/api/v1/';
+const baseURL = 'http://localhost:5000/api/v1/';
 const pb = document.getElementById('paste-here');
 const pbTextArea = document.getElementById('paste-here-textarea');
 pb.contentEditable = true;
@@ -35,6 +35,7 @@ async function getLinkContent(uid) {
     const result = hljs.highlightAuto(data.content);
     pb.className = result.language; // set language class for highlight.js
     hljs.highlightElement(pb);
+    hljs.initLineNumbersOnLoad();
 
 }
 
@@ -76,6 +77,7 @@ async function createLink() {
 
 // Usage example
 document.addEventListener('keydown', function (event) {
+    if (!isValidID(id)) return;
     // console.log('Key pressed: ', event.key, ' Ctrl key pressed: ', event.ctrlKey)
     if (event.ctrlKey && (event.key === 'v' || event.key === 'V')) {
         event.preventDefault();

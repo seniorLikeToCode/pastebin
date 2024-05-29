@@ -20,3 +20,26 @@ pre code.hljs {
 .hljs {
     padding: 0 !important;
 }
+
+
+/* for block of numbers */
+.hljs-ln-numbers {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    text-align: right;
+    color: #ccc;
+    vertical-align: top;
+    padding-right: 5px;
+
+    /* your custom style here */
+}
+
+/* for block of code */
+.hljs-ln-code {
+    padding-left: 20px !important;
+}

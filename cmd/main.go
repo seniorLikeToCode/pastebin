@@ -53,7 +53,7 @@ func main() {
 	// Get the server address from environment variable or default
 	addr := os.Getenv("SERVER_ADDR")
 	if addr == "" {
-		addr = ":6322"
+		addr = ":5000"
 	}
 
 	server := api.NewAPIServer(addr, db)
