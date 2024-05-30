@@ -1,4 +1,4 @@
-const baseURL = 'http://13.51.139.149:5000/api/v1/';
+const baseURL = 'http://localhost:5000/api/v1/';    //13.51.139.149
 const pb = document.getElementById('paste-here');
 const pbTextArea = document.getElementById('paste-here-textarea');
 pb.contentEditable = true;
@@ -41,14 +41,24 @@ async function getLinkContent(uid) {
 
 getLinkContent(id);
 
-
-function pasteFromClipboard() {
-    navigator.clipboard.readText().then(function (text) {
+async function readFromClipboard() {
+    try {
+        const text = await navigator.clipboard.readText();
+        console.log('Clipboard text:', text);
         pbTextArea.value = text;
+    } catch (err) {
+        console.error('Failed to read clipboard contents:', err);
+    }
+}
 
-    }).catch(function (err) {
-        console.error('Could not read text from clipboard: ', err);
-    });
+
+async function reqPermissionForRead() {
+    const result = await navigator.permissions.query({ name: 'clipboard-write' });
+    if (result.state === 'granted' || result.state === 'prompt') {
+        readFromClipboard();
+    } else {
+        console.error('Clipboard permission denied');
+    }
 }
 
 function copyToClipboard(text) {
@@ -78,11 +88,11 @@ async function createLink() {
 // Usage example
 document.addEventListener('keydown', function (event) {
     if (!isValidID(id)) return;
-    // console.log('Key pressed: ', event.key, ' Ctrl key pressed: ', event.ctrlKey)
+    console.log('Key pressed: ', event.key, ' Ctrl key pressed: ', event.ctrlKey)
     if (event.ctrlKey && (event.key === 'v' || event.key === 'V')) {
         event.preventDefault();
         pb.removeAttribute('data-highlighted');
-        pasteFromClipboard();
+        reqPermissionForRead();
     }
 
     if (event.ctrlKey && (event.key === 's' || event.key === 'S')) {
