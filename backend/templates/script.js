@@ -1,4 +1,4 @@
-const baseURL = 'http://localhost:5000/api/v1/';    //13.51.139.149
+const baseURL = 'http://13.51.139.149:5000/api/v1/';    //13.51.139.149
 const pb = document.getElementById('paste-here');
 const pbTextArea = document.getElementById('paste-here-textarea');
 pb.contentEditable = true;
